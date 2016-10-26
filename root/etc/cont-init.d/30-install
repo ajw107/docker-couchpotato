@@ -1,16 +1,74 @@
 #!/usr/bin/with-contenv bash
 
-# create folders
-mkdir -p \
-	/var/log/couchpotato
+if [ -z "${CONFIG}" ]
+then
+    CONFIG="/config"
+fi
 
-# install app
-[[ ! -d "/app/couchpotato/.git" ]] && \
-	git clone https://github.com/CouchPotato/CouchPotatoServer /app/couchpotato
+if [ -z "${APP_ROOT}" ]
+then
+    APP_ROOT="/app"
+fi
 
-# permissions
-chown -R abc:abc \
-	/app
+if [ -z "${APPDIRNAME}" ]
+then
+    APPDIRNAME="couchpotato"
+fi
 
-chmod 777 \
-	/var/log/couchpotato
+if [ -z "${GITURL}" ]
+then
+    GITURL="https://github.com/CouchPotato/CouchPotatoServer.git"
+fi
+
+if [ -z "${GITBRANCH}" ]
+then
+    GITBRANCH="develop"
+fi
+
+if [ -z "${APP_EXEC}" ]
+then
+    APP_EXEC="CouchPotato.py"
+fi
+
+if [ -z "${APP_OPTS}" ]
+then
+    APP_OPTS="--config_file=${CONFIG}/config.ini --data_dir=${CONFIG}/data"
+fi
+
+if [ -z "${APP_COMP}" ]
+then
+    APP_COMP="python"
+fi
+
+####ALL user vars set up and checked now, I think.....
+
+# create folders
+mkdir -p "${APP_ROOT}"
+mkdir -p "${CONFIG}"
+mkdir -p /var/log/couchpotato
+#maybe should do /mnt and newgroup /folders, but too tired
+
+# install app
+if [[ -d "${APP_ROOT}/${APPDIRNAME}/.git" ]]
+then
+    cd "${APP_ROOT}/${APPDIRNAME}"
+    git stash
+    git checkout ${GITBRANCH}
+    git pull
+else
+    git clone ${GITURL} "${APP_ROOT}/${APPDIRNAME}" -b $GITBRANCH
+fi
+
+if [[ -d "${APP_ROOT}/CP-BackupTool/.git" ]]
+then
+    cd "${APP_ROOT}/CP-BackupTool"
+    git stash
+    git pull
+else
+    git clone https://github.com/clinton-hall/CP-BackupTool.git "${APP_ROOT}/CP-BackupTool"
+fi
+
+# permissions
+chown -R abc:abc "${APP_ROOT}"
+chown -R abc:abc "${CONFIG}"
+chmod 777 /var/log/couchpotato
