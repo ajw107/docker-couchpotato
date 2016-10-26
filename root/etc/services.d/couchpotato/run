@@ -2,6 +2,8 @@
 
 umask 022
 
+#variables set in /etc/cont-init.d/20 I think
+
 exec \
-	s6-setuidgid abc python /app/couchpotato/CouchPotato.py \
-	--config_file=/config/config.ini --data_dir=/config/data
+	s6-setuidgid abc "$APP_COMP" "$APPDIR/${APP_EXEC}" \
+          "$APP_OPTS"
