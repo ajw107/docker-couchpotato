@@ -1,5 +1,5 @@
-FROM lsiobase/alpine.python
-MAINTAINER sparklyballs
+FROM lsiobase/alpine.python:3.5
+MAINTAINER sparklyballs, ajw107 (Alex Wood)
 
 # set python to use utf-8 rather than ascii.
 ENV PYTHONIOENCODING="UTF-8"
